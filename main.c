@@ -3,24 +3,22 @@
 #include <string.h>
 
 
-//Codierfunktion
+//Codierfunktion, Eingabe von Urtext und Schlüsselwort
 char * code(char*text, char*key) {
 
-    //Schlüsselwort soll so lang wie Urtext sein -> iteration
+    //Schlüsselwort soll so lang wie Urtext sein -> iteration des Schlüsselwortes
     if(strlen(key) < strlen(text)) {
         int a = strlen(key);
         for(int i = strlen(key); i < strlen(text); i += 1) { 
             key[i] = key[i-a];
         }
     }
-    //printf("%s\n", key);
 
-    //Alphabet array als Hilfsarray
+    //Alphabet array als Hilfsarray, Position von Buchstaben im array entspricht der Position im Alphabet
     char * alphabet = malloc(26);   //Speicherplatz reservieren, 26 Buchstaben im Alphabet
     for(int i = 0; i<26; i++) {
         alphabet[i] = 'A' + i;
     }
-    //printf("%s\n", alphabet);
 
     //string crypt für verschlüsselten text
     char * crypt = malloc(strlen(text));  //Speicher in Länge von Urtext reservieren
@@ -31,7 +29,7 @@ char * code(char*text, char*key) {
         int y = 0;
 
         //Buchstaben an gleicher Position in Zahl zwischen 0 und 26 umwandeln, zum Umwandeln unterscheiden zwischen groß- und kleinschreibung
-        //Urtext umwandeln, Leerzeichen bei 32 lassen
+        //Urtext umwandeln, Leerzeichen bei ascii32 lassen
         if(text[i] >= 'a' && text[i] <= 'z') {
             y = text[i] - 'a';
         }
@@ -41,7 +39,7 @@ char * code(char*text, char*key) {
         else if (text[i] == 32) {                 //falls Leerzeichen dann lassen
             y = 32;
         }
-        else {printf("Ungültige Eingabe\n");}
+        else {printf("Ungültige Eingabe an Position %d\n", i);}
 
         //key umwandeln, enthält keine Leerzeichen
         if(key[i] >= 'a' && key[i] <= 'z') {
@@ -50,7 +48,7 @@ char * code(char*text, char*key) {
         else if (key[i] >= 'A' && key[i] <= 'Z') {
             x = key[i] - 'A';
         }
-        else {printf("Ungültige Eingabe\n");}
+        else {printf("Ungültige Eingabe an Position %d\n, i");}
 
         //falls Leerzeichen dann bleibt Leerzeichen
         if(y == 32) {
@@ -58,19 +56,12 @@ char * code(char*text, char*key) {
         //falls kein Leerzeichen dann verschlüsseln
         } else {
             int summe = x + y;
-            if(summe >= 26) {
+            if(summe >= 26)) {
                 summe -= 26;
             }
             crypt[i] = alphabet[summe];
         }
     }
-
-    //printf("%s\n", crypt);
-    /*
-    for(int i = 0; i<strlen(text); i++) {
-        printf("%c ", crypt[i]);  
-    }
-    */
 
     free(alphabet);
     return crypt;           
@@ -78,12 +69,6 @@ char * code(char*text, char*key) {
 
 //Funktion decode
 char * decode(char*text, char*key) {
-
-    /*
-    for(int i = 0; i<strlen(text); i++) {   //text eingabe bricht ab bei Leerzeichen
-        printf("%c ", text[i]);  
-    }
-    */
     
     //Schlüsselwort soll so lang wie Urtext sein -> iteration
     if(strlen(key) < strlen(text)) {
@@ -92,9 +77,8 @@ char * decode(char*text, char*key) {
             key[i] = key[i-a];
         }
     }
-    //printf("longkey: %s\n", key); //Kontrolle
 
-    //Alphabet array
+    //Alphabet array als Hilfsarray wieder
     char * alphabet = malloc(26);   //Speicherplatz reservieren, 26 Buchstaben im Alphabet
     for(int i = 0; i<26; i++) {
         alphabet[i] = 'A' + i;
@@ -140,7 +124,7 @@ char * decode(char*text, char*key) {
     return neutext;
 }
 
-//Funktion zur Ausgabe von strings
+//Funktion zur Ausgabe von strings (über printf("%s") würde bei erstem Leerzeichen abbrechen)
 void print(char* text) {
     for(int i = 0; i<strlen(text); i++) {
         printf("%c", text[i]);  
