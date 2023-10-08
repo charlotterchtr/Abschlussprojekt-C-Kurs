@@ -58,7 +58,7 @@ char * code(char*text, char*key) {
         //falls kein Leerzeichen dann verschlüsseln
         } else {
             int summe = x + y;
-            if(summe > 26) {
+            if(summe >= 26) {
                 summe -= 26;
             }
             crypt[i] = alphabet[summe];
@@ -73,7 +73,7 @@ char * code(char*text, char*key) {
     */
 
     free(alphabet);
-    return crypt;           //Speicherplatz wieder freigeben irgendwann?
+    return crypt;           
 }
 
 //Funktion decode
@@ -138,8 +138,16 @@ char * decode(char*text, char*key) {
 
     free(alphabet);
     return neutext;
-}    
+}
 
+//Funktion zur Ausgabe von strings
+void print(char* text) {
+    for(int i = 0; i<strlen(text); i++) {
+        printf("%c", text[i]);  
+    }
+    printf("\n");
+    return;
+}
 
 int main() {
 
@@ -167,10 +175,7 @@ int main() {
     crypt = code(urtext, key);              //bricht stringinput bei Leerzeichen ab?
 
     //Verschlüsselten Text ausgeben -> evtl. in Datei später?
-    for(int i = 0; i<strlen(urtext); i++) {
-        printf("%c", crypt[i]);  
-    }
-    printf("\n");
+    print(crypt);
 
 //Entschlüsseln / crypt - key = urtext
 
@@ -183,11 +188,9 @@ int main() {
     neutext = decode(crypt, key);   
 
     //entschlüsselten Text ausgeben -> evtl. in Datei später?
-    for(int i = 0; i<strlen(urtext); i++) {
-        printf("%c", neutext[i]);  
-    }
-    printf("\n");
+    print(neutext);
 
+//dynamisch reservierten Speicher freigeben
     free(crypt);
     free(urtext);
     free(key);
