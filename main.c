@@ -1,22 +1,29 @@
 /*
-In Kommandozeile schreiben zum
+C-Blockkurs WS 23/24
+
+Matrikelnummer: 2160621
+Name: Hedwig Charlotte Richter
+M. Sc. Computational Science
+(unbenotet)
+
+Projektname: Vigenère-Chiffre
+
+Compileraufruf zum
+
     a) chiffrieren
-        gcc main.c
-        ./a.out c Praktische_Physik.txt 
+            gcc main.c
+            ./a.out c Praktische_Physik.txt 
         (chiffrierter Text wird in Datei Crypt.txt geschrieben)
+
     b) dechiffrieren
-        gcc main.c
-        ./a.out d Crypt.txt
+            gcc main.c
+            ./a.out d Crypt.txt
         (dechiffrierter Text wird in Datei Clear.txt geschrieben)
     
     Schlüsselwort kann bliebig vergeben werden, ohne Umlaute, sollte natürlich zum ver- und entschlüsseln dasselbe sein
 */
 
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
+#include "header.h"
 
 //Codierfunktion, Eingabe von Urtext und Schlüsselwort
 char * code(char*text, char*key) {
@@ -124,30 +131,18 @@ char * decode(char*text, char*key) {
     return neutext;
 }
 
-//Funktion zur Ausgabe von strings (über printf("%s") würde bei erstem Leerzeichen abbrechen)
-/*
-void print(char* text) {
-    for(int i = 0; i<strlen(text); i++) {
-        printf("%c", text[i]);  
-    }
-    printf("\n");
-    return;
-}
-*/
-
 //Funktion zur Ausgabe in Datei
 void printFile(char* text, FILE * filename) {
     for(int i = 0; i<strlen(text); i++) {
         fprintf(filename, "%c", text[i]);  
     }
-    //fprintf(filename, "\n");
     return;
 }
 
 
 int main(int argc, char **argv) {
 
-        //eine Eingebae akzeptiert (argc = 2)
+        //zwei Eingaben akzeptiert (argc = 3)
         if(argc < 2 || argc > 3) { //argc = 0 immer Betriebssystem, arc = 1 ist erste Eingabe
         printf("Usage: no valid imput \n");
         exit(1);
@@ -225,7 +220,7 @@ else if (strcmp(argv[1], "d") == 0) {
 }
 
 else {
-    printf("Ungültige Eingabe, bitte c zum Chiffrieren und d zum Dechiffrieren eingeben, danach Dateiname\n");
+    printf("Ungültige Eingabe \nBitte c zum Chiffrieren oder d zum Dechiffrieren eingeben, \ndanach Dateiname\n");
 }
     
 
