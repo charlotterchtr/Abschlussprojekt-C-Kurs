@@ -38,8 +38,7 @@ char * code(char*text, char*key) {
         }
         else if (text[i] == 32) {                 //falls Leerzeichen dann lassen
             y = 32;
-        }
-        else {printf("Ungültige Eingabe an Position %d\n", i);}
+        } else {y = 100;}                         //falls Sonderzeichen dann ok, 100 random nummer außerhalb alphabet festgelegt
 
         //key umwandeln, enthält keine Leerzeichen
         if(key[i] >= 'a' && key[i] <= 'z') {
@@ -48,15 +47,17 @@ char * code(char*text, char*key) {
         else if (key[i] >= 'A' && key[i] <= 'Z') {
             x = key[i] - 'A';
         }
-        else {printf("Ungültige Eingabe an Position %d\n, i");}
+        else {printf("Ungültige Eingabe an Position %d\n", i);} //Schlüsselwort soll keine Sonderzeichen enthalten
 
         //falls Leerzeichen dann bleibt Leerzeichen
         if(y == 32) {
             crypt[i] = '_';
         //falls kein Leerzeichen dann verschlüsseln
+        } else if (y == 100) {
+            crypt[i] = text[i];                                 //Sonderzeichen übernehmen
         } else {
             int summe = x + y;
-            if(summe >= 26)) {
+            if(summe >= 26) {
                 summe -= 26;
             }
             crypt[i] = alphabet[summe];
@@ -103,14 +104,18 @@ char * decode(char*text, char*key) {
         //crypt in Zahlen umwandeln, ist nur groß geschrieben, Leerzeichen lassen
         if (text[i] == '_') {
             y = 32;
-        } else {
-        y = text[i] - 'A';
+        } else if (text[i] >= 'A' && text[i] <= 'Z') {      //eh nur Großbuchstaben
+            y = text[i] - 'A';
+        } else {                                            //falls Sonderzeichen
+            y = 100;
         }
 
         //falls Leerzeichen dann bleibt Leerzeichen
         if(y == 32) {
             neutext[i] = ' ';
         //falls kein Leerzeichen dann entschlüsseln
+        } else if (y == 100) {
+            neutext[i] = text[i];                          //Sonderzeichen übernehmen
         } else {
             int summe = y - x;
             if(summe < 0) {
