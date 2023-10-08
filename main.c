@@ -14,12 +14,6 @@ char * code(char*text, char*key) {
         }
     }
 
-    //Alphabet array als Hilfsarray, Position von Buchstaben im array entspricht der Position im Alphabet
-    char * alphabet = malloc(26);   //Speicherplatz reservieren, 26 Buchstaben im Alphabet
-    for(int i = 0; i<26; i++) {
-        alphabet[i] = 'A' + i;
-    }
-
     //string crypt für verschlüsselten text
     char * crypt = malloc(strlen(text));  //Speicher in Länge von Urtext reservieren
 
@@ -27,18 +21,6 @@ char * code(char*text, char*key) {
     for(int i = 0; i < strlen(text); i++) {
         int x = 0; //Werte egal
         int y = 0;
-
-        //Buchstaben an gleicher Position in Zahl zwischen 0 und 26 umwandeln, zum Umwandeln unterscheiden zwischen groß- und kleinschreibung
-        //Urtext umwandeln, Leerzeichen bei ascii32 lassen
-        if(text[i] >= 'a' && text[i] <= 'z') {
-            y = text[i] - 'a';
-        }
-        else if (text[i] >= 'A' && text[i] <= 'Z') {
-            y = text[i] - 'A';
-        }
-        else if (text[i] == 32) {                 //falls Leerzeichen dann lassen
-            y = 32;
-        } else {y = 100;}                         //falls Sonderzeichen dann ok, 100 random nummer außerhalb alphabet festgelegt
 
         //key umwandeln, enthält keine Leerzeichen
         if(key[i] >= 'a' && key[i] <= 'z') {
@@ -49,22 +31,33 @@ char * code(char*text, char*key) {
         }
         else {printf("Ungültige Eingabe an Position %d\n", i);} //Schlüsselwort soll keine Sonderzeichen enthalten
 
-        //falls Leerzeichen dann bleibt Leerzeichen
-        if(y == 32) {
-            crypt[i] = '_';
-        //falls kein Leerzeichen dann verschlüsseln
-        } else if (y == 100) {
-            crypt[i] = text[i];                                 //Sonderzeichen übernehmen
-        } else {
-            int summe = x + y;
-            if(summe >= 26) {
-                summe -= 26;
+        //Buchstaben an gleicher Position in Zahl zwischen 0 und 26 umwandeln, zum Umwandeln unterscheiden zwischen groß- und kleinschreibung
+        //Urtext umwandeln, Leerzeichen bei ascii32 lassen
+        if(text[i] >= 'a' && text[i] <= 'z') {
+            if (text[i] + x > 122) {
+                crypt[i] = (text[i] + x) - 26;
+            } else {
+            crypt[i] = text[i] + x;
             }
-            crypt[i] = alphabet[summe];
+            //y = text[i] - 'a';
         }
+        else if (text[i] >= 'A' && text[i] <= 'Z') {
+            if (text[i] + x > 90) {
+                crypt[i] = (text[i] + x) - 26;
+            } else {
+            crypt[i] = text[i] + x;
+            }
+            //y = text[i] - 'A';
+        }
+        else if (text[i] == 32) {                   //falls Leerzeichen dann lassen
+            crypt[i] = '_';
+        } else {
+            crypt[i] = text[i];                    //falls Sonderzeichen dann ok, 100 random nummer außerhalb alphabet festgelegt
+        }                         
+
+    
     }
 
-    free(alphabet);
     return crypt;           
 }
 
@@ -77,12 +70,6 @@ char * decode(char*text, char*key) {
         for(int i = strlen(key); i < strlen(text); i += 1) { 
             key[i] = key[i-a];
         }
-    }
-
-    //Alphabet array als Hilfsarray wieder
-    char * alphabet = malloc(26);   //Speicherplatz reservieren, 26 Buchstaben im Alphabet
-    for(int i = 0; i<26; i++) {
-        alphabet[i] = 'A' + i;
     }
 
     //Neutext als array
@@ -101,31 +88,29 @@ char * decode(char*text, char*key) {
         }
         else {printf("Ungültige Eingabe\n");}
 
-        //crypt in Zahlen umwandeln, ist nur groß geschrieben, Leerzeichen lassen
-        if (text[i] == '_') {
-            y = 32;
-        } else if (text[i] >= 'A' && text[i] <= 'Z') {      //eh nur Großbuchstaben
-            y = text[i] - 'A';
-        } else {                                            //falls Sonderzeichen
-            y = 100;
-        }
-
-        //falls Leerzeichen dann bleibt Leerzeichen
-        if(y == 32) {
-            neutext[i] = ' ';
-        //falls kein Leerzeichen dann entschlüsseln
-        } else if (y == 100) {
-            neutext[i] = text[i];                          //Sonderzeichen übernehmen
-        } else {
-            int summe = y - x;
-            if(summe < 0) {
-                summe += 26;
+        if(text[i] >= 'a' && text[i] <= 'z') {
+            if (text[i] - x < 97) {
+                neutext[i] = (text[i] - x) + 26;
+            } else {
+            neutext[i] = text[i] - x;
             }
-            neutext[i] = alphabet[summe];
+            //y = text[i] - 'a';
         }
+        else if (text[i] >= 'A' && text[i] <= 'Z') {
+            if (text[i] - x < 65) {
+                neutext[i] = (text[i] - x) + 26;
+            } else {
+            neutext[i] = text[i] - x;
+            }
+            //y = text[i] - 'A';
+        }
+        else if (text[i] == '_') {                   //falls Leerzeichen dann lassen
+            neutext[i] = ' ';
+        } else {
+            neutext[i] = text[i];                    //falls Sonderzeichen dann ok, 100 random nummer außerhalb alphabet festgelegt
+        }   
     }
 
-    free(alphabet);
     return neutext;
 }
 
