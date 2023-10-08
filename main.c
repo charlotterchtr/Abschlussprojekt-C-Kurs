@@ -54,7 +54,7 @@ char * code(char*text, char*key) {
 
         //falls Leerzeichen dann bleibt Leerzeichen
         if(y == 32) {
-            crypt[i] == text[i];
+            crypt[i] = '_';
         //falls kein Leerzeichen dann verschlüsseln
         } else {
             int summe = x + y;
@@ -117,7 +117,7 @@ char * decode(char*text, char*key) {
         else {printf("Ungültige Eingabe\n");}
 
         //crypt in Zahlen umwandeln, ist nur groß geschrieben, Leerzeichen lassen
-        if (text[i] == 32) {
+        if (text[i] == '_') {
             y = 32;
         } else {
         y = text[i] - 'A';
@@ -125,7 +125,7 @@ char * decode(char*text, char*key) {
 
         //falls Leerzeichen dann bleibt Leerzeichen
         if(y == 32) {
-            neutext[i] == text[i];
+            neutext[i] = ' ';
         //falls kein Leerzeichen dann entschlüsseln
         } else {
             int summe = y - x;
@@ -153,6 +153,7 @@ int main() {
     //printf("Eingegeben ist: %s\n", urtext); //Kontrolle
 
 //Schlüsselwort eingeben
+
     char * key = malloc(textlength); //Speicherplatz reservieren, urtext ist pointer auf array Beginn
 
     printf("Schlüsselwort (ohne Leerzeichen) eingeben: \n");
@@ -167,7 +168,7 @@ int main() {
 
     //Verschlüsselten Text ausgeben -> evtl. in Datei später?
     for(int i = 0; i<strlen(urtext); i++) {
-        printf("%c ", crypt[i]);  
+        printf("%c", crypt[i]);  
     }
     printf("\n");
 
@@ -177,14 +178,13 @@ int main() {
     printf("Schlüsselwort (ohne Leerzeichen) eingeben: \n");
     scanf("%100s", key);    //string abbruch bei Zeilenumbruch, maximal 100 character
 
-    //printf("Eingegeben ist: %s\n", key); //Kontrolle
-
+    //Speicher für neue Ausgabe reservieren in Größe von Urtext
     char * neutext = malloc(strlen(urtext));
     neutext = decode(crypt, key);   
 
     //entschlüsselten Text ausgeben -> evtl. in Datei später?
     for(int i = 0; i<strlen(urtext); i++) {
-        printf("%c ", neutext[i]);  
+        printf("%c", neutext[i]);  
     }
     printf("\n");
 
