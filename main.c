@@ -37,7 +37,9 @@ char * code(char*text, char*key) {
     }
 
     //string crypt für verschlüsselten text
-    char * crypt = malloc(strlen(text));  //Speicher in Länge von Urtext reservieren
+    char * crypt = malloc(strlen(text));  
+    //Speicher in Länge von Urtext reservieren
+    //0 an string ende lassen (+1 speicherplatz reservieren) dann funktioniert print %s
 
     //Verschlüsseln
     for(int i = 0; i < strlen(text); i++) {
