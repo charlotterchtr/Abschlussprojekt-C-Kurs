@@ -141,12 +141,68 @@ void printFile(char* text, FILE * filename) {
     return;
 }
 
+//Struct mit Speicher für zwei int
+typedef struct {
+        int  position;
+        int  number;
+        } AutoCorr;
+
+//Autokorrelation
+AutoCorr * Corr(FILE * datei, int textlength, char * textzeile) {
+    AutoCorr * array;                               //Ergebnis der Autokorrelation in struct gespeichert mit Übereinstimmung und Position
+    array = malloc(textlength*sizeof(*array)); 
+    
+    while(!feof(datei)) {
+        fgets(textzeile, textlength, datei); //eine Zeile aus Datei
+
+        for(int j = 1; j<strlen(textzeile); j++) {  
+            array[j].position = j;                              //j ist Anzahl der Positionen um die verschoben wird
+            for( int i = j; i<strlen(textzeile); i++) {         //i ist Position im array
+                if (textzeile[i] != '_' && textzeile[i-j] == textzeile[i]) {
+                    array[j].number += 1;
+                }           
+            }
+        }
+    }
+    array[32].number = 0;           //Zeilenlänge vermutlich oft 32 deshalb keine Aussage über Schlüsselwort, wird ausgeschlossen
+    return array;
+}
+
+//Maxima einer Menge an Zahlen
+AutoCorr * getMax(AutoCorr * array, int N) {    //die N größten Zahlen
+    AutoCorr * max;
+    max = malloc(N*sizeof(*max));               //struct in das maxima gespeichert werden sollen, die N größten
+
+    for(int j = 0; j<N; j++) {
+        max[j].number = 0;                      //maximum ist in max[j].number zwischengespeichert
+        for(int i = 0; i<200; i++) {      
+                if (array[i].number > max[j].number) {
+                    max[j].number = array[i].number;
+                    max[j].position = array[i].position;
+            }
+        }
+        for(int i = 0; i<200; i++) {
+                if (array[i].position == max[j].position) {
+                    array[i].number = 0;
+            }
+        }
+    }
+
+    return max;
+}
+
+//Größter gemeinsamer Teiler
+        int gcd(int a, int b) {
+        if (b == 0) return a;
+        return gcd(b, a % b);
+        }
+
 
 int main(int argc, char **argv) {
 
         //zwei Eingaben akzeptiert (argc = 3)
         if(argc < 2 || argc > 3) { //argc = 0 immer Betriebssystem, arc = 1 ist erste Eingabe
-        printf("Usage: no valid imput \n");
+        printf("Ungültige Eingabe \nBitte c zum Chiffrieren, d zum Dechiffrieren oder a für Angriff eingeben, \ndanach Dateiname\n");
         exit(1);
         }
 
@@ -221,9 +277,77 @@ else if (strcmp(argv[1], "d") == 0) {
 
 }
 
-else {
-    printf("Ungültige Eingabe \nBitte c zum Chiffrieren oder d zum Dechiffrieren eingeben, \ndanach Dateiname\n");
+//Statistischer Angriff -> Länge des Schlüsselworts herausfinden
+else if (strcmp(argv[1], "a") == 0) {
+
+    char* dateiname = argv[2];
+    FILE * urdatei = fopen(dateiname, "r");
+
+    int textlength = 200;                       //maximale string Länge, hoffentlich ist keine Zeile länger als 200 Zeichen
+    char * urtext = malloc(textlength); 
+
+    //Autokorrelation von verschlüsseltem Text
+    AutoCorr * array;                               //Ergebnis der Autokorrelation in struct gespeichert mit Übereinstimmung und Position
+    array = Corr(urdatei, textlength, urtext);
+    
+    //die Positionen mit den N=10 größten Übereinstimmungen herauslesen aus Autokorrelations struct (array)
+    //denn nur Positionen mit größten Übereinstimmungen sind relevant
+    AutoCorr * max;
+    int N = 10;
+    max = getMax(array, N);
+
+    //print
+    printf("\nErgebnis der Autokorrelation (Anzahl der Übereinstimmungen bei Verschiebung um Positionen x): \n");
+    for(int j = 0; j<N; j++) {
+        printf("Verschiebung um %d: %d\n", max[j].position, max[j].number);
+    }
+    printf("\n");
+
+    //Größter gemeinsamer Teiler der Positionsnummern -> in teiler-array gespeichert
+    int x = 0;
+    int * teiler = malloc(N*10*sizeof(int));
+    while(max[x+1].number > 70) {     //>70 random gewählt aber soll nur die signifikantesten Ergebnisse nehmen, für maximal 10 ist Speicher reserviert
+    teiler[x] = gcd(max[x].position, max[x+1].position);
+    x++;
+    }
+
+    //Häufigkeit des größten gemeinsamen Teilers aus teiler-array in length-array
+    AutoCorr * length = malloc(15*sizeof(*length));
+    for(int j = 0; j<15; j++) {
+        length[j].number = 0;       //auf 0 setzen um Speichereffekte zu vermeiden
+    }
+    x=0;
+    //Zählen
+    while (teiler[x] != 0) {
+        for(int i=2; i<15; i++) {
+            length[i-2].position = i;
+                if(teiler[x] == i){
+                length[i-2].number += 1;
+                }
+        }
+        x++;
+    }
+
+    //Die zwei Teiler mit dem höchsten Vorkommen herauslesen und ausgeben
+    AutoCorr * solution;
+    solution = getMax(length, 2);
+
+    printf("Das Schlüsselwort ist vermutlich %d oder %d Zeichen lang\n", solution[0].position, solution[1].position);
+
+    fclose(urdatei);
+    free(urtext);
+    free(teiler);
+    free(length);
+
 }
     
 
+else {
+    printf("Ungültige Eingabe \nBitte c zum Chiffrieren, d zum Dechiffrieren oder a für Angriff eingeben, \ndanach Dateiname\n");
 }
+
+}
+
+
+
+
